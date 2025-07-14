@@ -2,8 +2,8 @@
 import os
 import requests
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-SEARCH_ENGINE_ID = os.getenv("GOOGLE_SEARCH_ENGINE_ID")
+GOOGLE_API_KEY = os.getenv("AIzaSyBDXkHm1CWKrniC3LDH_Qm57JQT4EIuxhc")
+SEARCH_ENGINE_ID = os.getenv("5612c1387fb4945ff")
 
 
 def google_search(query, num_results=3):
