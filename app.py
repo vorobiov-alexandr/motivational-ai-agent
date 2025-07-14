@@ -121,9 +121,6 @@ else:
 # 🧠 Просмотр памяти агента
 st.subheader("🧠 Что знает агент?")
 if data:
-    if 'source' in df.columns:
-        st.dataframe(df[['step', 'goal', 'progress_delta', 'motivation', 'mood', 'source', 'info']])
-    else:
-        st.dataframe(df)
+    st.dataframe(df)
 else:
     st.info("Агент пока ничего не знает.")
