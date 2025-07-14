@@ -1,4 +1,4 @@
-
+# === app.py ===
 import streamlit as st
 from goal import Goal
 from agent import AIAgent
@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import json
 import os
+from io import BytesIO
 
 st.set_page_config(page_title="Мотивационный ИИ-Агент", layout="centered")
 st.title("🤖 Мотивационный ИИ-Агент")
@@ -42,6 +43,7 @@ if col1.button("💾 Сохранить лог"):
     with open(SAVE_GOALS, "w", encoding="utf-8") as f:
         json.dump([{"name": g.name, "priority": g.priority, "progress": g.progress} for g in agent.goals.goals], f)
     st.sidebar.success("Лог и цели сохранены")
+
 if col2.button("📂 Загрузить лог"):
     if os.path.exists(SAVE_LOG):
         with open(SAVE_LOG, "r", encoding="utf-8") as f:
@@ -60,6 +62,18 @@ if st.sidebar.button("🧹 Очистить всё"):
     agent.goals.goals.clear()
     agent.memory.log.clear()
     st.sidebar.success("Все данные очищены")
+
+# Кнопка скачивания лога
+if agent.memory.log:
+    log_bytes = BytesIO()
+    log_bytes.write(json.dumps(agent.memory.log, indent=2, ensure_ascii=False).encode('utf-8'))
+    log_bytes.seek(0)
+    st.sidebar.download_button(
+        label="📥 Скачать лог",
+        data=log_bytes,
+        file_name="log.json",
+        mime="application/json"
+    )
 
 with st.form("run_form"):
     steps = st.slider("Сколько шагов выполнить?", 1, 50, 5)
