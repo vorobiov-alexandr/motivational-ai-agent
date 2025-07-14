@@ -1,54 +1,37 @@
-from goal import Goal
-from goals_manager import GoalsManager
-from motivation import MotivationSystem
+# === agent.py ===
 from memory import Memory
-import requests
-from bs4 import BeautifulSoup
+from goals import GoalsManager
+from motivation import Motivation
+from google_search import google_search
+import random
 
 class AIAgent:
     def __init__(self):
-        self.goals = GoalsManager()
-        self.motivation = MotivationSystem()
         self.memory = Memory()
-
-    def fetch_google_search(self, query):
-        try:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                              "Chrome/103.0.0.0 Safari/537.36"
-            }
-            response = requests.get(f"https://www.google.com/search?q={query}", headers=headers, timeout=5)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                results = []
-                for g in soup.find_all('div', class_='tF2Cxc')[:3]:
-                    title = g.find('h3')
-                    link = g.find('a')['href']
-                    if title and link:
-                        results.append(f"{title.get_text()} - {link}")
-                return "\n".join(results) if results else "Ничего не найдено"
-            else:
-                return "Ошибка запроса к Google"
-        except Exception as e:
-            return f"Ошибка: {e}"
+        self.goals = GoalsManager()
+        self.motivation = Motivation()
+        self.step_count = 0
 
     def run_step(self):
-        goal = self.goals.get_top_goal()
+        self.step_count += 1
+        goal = self.motivation.select_goal(self.goals)
         if not goal:
             return
 
-        info = self.fetch_google_search(goal.name)
+        # Эмуляция выполнения шага
+        progress_delta = min(1.0 - goal.progress, random.uniform(0.01, 0.1))
+        goal.progress += progress_delta
 
-        progress_delta = 0.1
-        goal.progress = min(1.0, goal.progress + progress_delta)
+        # Получение информации из Google по теме цели
+        info_sources = google_search(goal.name)
+        source_info = info_sources[0] if info_sources else "Ничего не найдено"
 
-        log_entry = {
-            "step": len(self.memory.log) + 1,
+        # Сохранение в память
+        self.memory.log_step({
+            "step": self.step_count,
             "goal": goal.name,
             "progress_delta": progress_delta,
-            "motivation": self.motivation.level,
+            "motivation": self.motivation.calculate_motivation(goal),
             "mood": self.motivation.mood,
-            "info": info,
-            "source": f"Google Search: {goal.name}"
-        }
-        self.memory.log.append(log_entry)
+            "source": source_info
+        })
