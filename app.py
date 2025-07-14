@@ -75,6 +75,20 @@ if agent.memory.log:
         mime="application/json"
     )
 
+# Кнопка скачивания целей
+if agent.goals.goals:
+    goals_bytes = BytesIO()
+    goals_bytes.write(json.dumps([
+        {"name": g.name, "priority": g.priority, "progress": g.progress} for g in agent.goals.goals
+    ], indent=2, ensure_ascii=False).encode('utf-8'))
+    goals_bytes.seek(0)
+    st.sidebar.download_button(
+        label="📥 Скачать цели",
+        data=goals_bytes,
+        file_name="goals.json",
+        mime="application/json"
+    )
+
 with st.form("run_form"):
     steps = st.slider("Сколько шагов выполнить?", 1, 50, 5)
     submitted = st.form_submit_button("▶️ Запустить")
@@ -104,3 +118,10 @@ if data:
     st.pyplot(fig)
 else:
     st.info("Лог пока пуст. Запусти шаги выше.")
+
+# 🧠 Просмотр памяти агента
+st.subheader("🧠 Что знает агент?")
+if data:
+    st.dataframe(df)
+else:
+    st.info("Агент пока ничего не знает.")
