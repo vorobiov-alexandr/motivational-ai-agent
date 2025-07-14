@@ -1,11 +1,15 @@
+from goal import Goal
+from goals_manager import GoalsManager
+from motivation import MotivationSystem
+from memory import Memory
 import requests
 from bs4 import BeautifulSoup
 
 class AIAgent:
     def __init__(self):
-        self.goals = GoalsManager()  # твой менеджер целей
-        self.motivation = MotivationSystem()  # твоя мотивация
-        self.memory = Memory()  # твоя память и лог
+        self.goals = GoalsManager()
+        self.motivation = MotivationSystem()
+        self.memory = Memory()
 
     def fetch_wikipedia_intro(self, topic):
         url = f"https://en.wikipedia.org/wiki/{topic.replace(' ', '_')}"
