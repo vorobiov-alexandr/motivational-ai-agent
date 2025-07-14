@@ -1,4 +1,3 @@
-# === app.py ===
 import streamlit as st
 from goal import Goal
 from agent import AIAgent
@@ -122,6 +121,9 @@ else:
 # 🧠 Просмотр памяти агента
 st.subheader("🧠 Что знает агент?")
 if data:
-    st.dataframe(df)
+    if 'source' in df.columns:
+        st.dataframe(df[['step', 'goal', 'progress_delta', 'motivation', 'mood', 'source', 'info']])
+    else:
+        st.dataframe(df)
 else:
     st.info("Агент пока ничего не знает.")
